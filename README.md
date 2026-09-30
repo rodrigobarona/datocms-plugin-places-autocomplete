@@ -1,5 +1,7 @@
 # Google Places Autocomplete
 
+![Google Places Autocomplete cover](marketplace/cover.jpg)
+
 A DatoCMS plugin that turns a JSON field into a Google Places address editor. Editors search for an address or venue, pick a suggestion, and the field stores structured JSON: street parts, city, region, country, postal code, venue name, formatted address, coordinates, and UTC offset.
 
 This is a new plugin. It keeps the JSON shape of the original [DatoCMS Address Autocomplete](https://github.com/elevationchurch/datocms-plugin-adress-autocomplete) plugin (v1.2.0, by Ulises Himely / Elevation Church) so existing records can be read by the same frontend queries. It does not replace that package or its Marketplace listing.
@@ -12,6 +14,8 @@ The original plugin was built on DatoCMS Plugin SDK 0.7, Create React App, and t
 - `@googlemaps/js-api-loader` 2 (`setOptions` and `importLibrary`)
 
 ## What editors see
+
+![Address field editor preview](marketplace/preview.jpg)
 
 **Plugin settings.** One required Google Maps API key, saved with an explicit Save button. The parameter name is `mapsAPIKey`.
 
