@@ -5,7 +5,7 @@ import ConfigScreen from './entrypoints/ConfigScreen';
 import FieldConfig from './entrypoints/FieldConfig';
 import { render } from './utils/render';
 
-const ADDRESS_EXTENSION_ID = 'address';
+const ADDRESS_EXTENSION_ID = 'googlePlacesAddress';
 type FieldExtensionId = typeof ADDRESS_EXTENSION_ID;
 
 function parseFieldExtensionId(value: string): FieldExtensionId {
