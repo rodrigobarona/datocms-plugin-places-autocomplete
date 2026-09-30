@@ -1,6 +1,6 @@
 {
   "name": "datocms-plugin-places-autocomplete",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A DatoCMS JSON field editor powered by Google Place Autocomplete.",
   "homepage": "https://github.com/rodrigobarona/datocms-plugin-places-autocomplete",
   "repository": {
