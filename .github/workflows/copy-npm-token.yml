@@ -1,0 +1,14 @@
+name: Copy npm token
+
+on:
+  workflow_dispatch:
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy NPM_TOKEN to the GeoJSON plugin repository
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_ADMIN_TOKEN }}
+        run: printf '%s' "$NPM_TOKEN" | gh secret set NPM_TOKEN --repo rodrigobarona/datocms-plugin-geojson-polygons
