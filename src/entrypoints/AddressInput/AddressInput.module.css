@@ -1,0 +1,51 @@
+.autocompleteHost {
+  width: 100%;
+}
+
+.autocompleteHost > gmp-place-autocomplete {
+  box-sizing: border-box;
+  color-scheme: light dark;
+  width: 100%;
+}
+
+.addressComponents {
+  display: grid;
+  gap: var(--spacing-m);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.addressComponents > :nth-child(1),
+.addressComponents > :nth-child(2),
+.addressComponents > :nth-child(4) {
+  grid-column: span 5;
+}
+
+.addressComponents > :nth-child(3),
+.addressComponents > :nth-child(7) {
+  grid-column: span 2;
+}
+
+.addressComponents > :nth-child(5) {
+  grid-column: span 2;
+}
+
+.addressComponents > :nth-child(6) {
+  grid-column: span 3;
+}
+
+.coordinates {
+  display: grid;
+  gap: var(--spacing-m);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (width <= 700px) {
+  .addressComponents > *,
+  .coordinates > * {
+    grid-column: 1 / -1;
+  }
+
+  .coordinates {
+    grid-template-columns: 1fr;
+  }
+}
