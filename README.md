@@ -113,7 +113,7 @@ pnpm peers check
 
 ## Publishing
 
-Version 1.0.0 publishes the `dist` folder. A published GitHub release runs the npm workflow when the `NPM_TOKEN` repository secret is set.
+Version 1.0.0 publishes the `dist` folder and the Marketplace images in `marketplace/`. `datoCmsPlugin.coverImage` is the listing banner, and `datoCmsPlugin.previewImage` is the field-editor preview. A published GitHub release runs the npm workflow when the `NPM_TOKEN` repository secret is set.
 
 ## License
 

@@ -15,7 +15,8 @@
     "address-autocomplete"
   ],
   "files": [
-    "dist"
+    "dist",
+    "marketplace"
   ],
   "engines": {
     "node": ">=22.12.0"
@@ -24,6 +25,8 @@
   "datoCmsPlugin": {
     "title": "Google Places Autocomplete",
     "entryPoint": "dist/index.html",
+    "coverImage": "marketplace/cover.jpg",
+    "previewImage": "marketplace/preview.jpg",
     "permissions": []
   },
   "scripts": {
