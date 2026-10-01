@@ -3,6 +3,7 @@ import type {
   LanguageOption,
   PluginParameters,
 } from '../types';
+import { normalizeFieldOption } from './fieldOptions';
 import { defaultLanguage } from './languages';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -37,10 +38,14 @@ function normalizeLanguage(value: unknown): LanguageOption {
 
 export function normalizeFieldParameters(value: unknown): FieldParameters {
   if (!isRecord(value)) {
-    return { language: defaultLanguage };
+    return {
+      language: defaultLanguage,
+      searchSeedField: null,
+    };
   }
 
   return {
     language: normalizeLanguage(value.language),
+    searchSeedField: normalizeFieldOption(value.searchSeedField),
   };
 }

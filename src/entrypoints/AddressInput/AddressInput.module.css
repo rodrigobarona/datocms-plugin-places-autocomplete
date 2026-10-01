@@ -14,23 +14,28 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
-.addressComponents > :nth-child(1),
-.addressComponents > :nth-child(2),
-.addressComponents > :nth-child(4) {
+.span2 {
+  grid-column: span 2;
+}
+
+.span3 {
+  grid-column: span 3;
+}
+
+.span4 {
+  grid-column: span 4;
+}
+
+.span5 {
   grid-column: span 5;
 }
 
-.addressComponents > :nth-child(3),
-.addressComponents > :nth-child(7) {
-  grid-column: span 2;
+.span6 {
+  grid-column: span 6;
 }
 
-.addressComponents > :nth-child(5) {
-  grid-column: span 2;
-}
-
-.addressComponents > :nth-child(6) {
-  grid-column: span 3;
+.span12 {
+  grid-column: span 12;
 }
 
 .location {
@@ -75,7 +80,12 @@
 }
 
 @media (width <= 700px) {
-  .addressComponents > * {
+  .span2,
+  .span3,
+  .span4,
+  .span5,
+  .span6,
+  .span12 {
     grid-column: 1 / -1;
   }
 

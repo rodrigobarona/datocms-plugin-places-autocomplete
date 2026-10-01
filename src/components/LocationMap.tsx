@@ -1,5 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
+import {
+  Map as MapLibreMap,
+  Marker,
+  NavigationControl,
+  setWorkerUrl,
+} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import styles from './LocationMap.module.css';
 
@@ -44,9 +49,9 @@ export default function LocationMap({ lat, lng }: LocationMapProps) {
       style: MAP_STYLE,
       center,
       zoom: PIN_ZOOM,
-      interactive: false,
       attributionControl: { compact: true },
     });
+    map.addControl(new NavigationControl({ showCompass: false }), 'top-right');
     mapRef.current = map;
     markerRef.current = new Marker({ color: '#e5484d' }).setLngLat(center).addTo(map);
 

@@ -12,7 +12,7 @@ This plugin keeps the JSON shape of the original [DatoCMS Address Autocomplete](
 
 ![Searching a place, dropping a pin, and reading the time zone](https://raw.githubusercontent.com/rodrigobarona/datocms-plugin-places-autocomplete/main/docs/demo.gif)
 
-The demo starts from a saved Lisbon address, searches Times Square Church, then Sagrada Família. The pin and the time zone update with each place, and **Reset to initial value** restores the address the record opened with. [Watch the full-quality MP4](https://raw.githubusercontent.com/rodrigobarona/datocms-plugin-places-autocomplete/main/docs/demo.mp4).
+The demo starts from a saved Lisbon address with district `Carnide`, then moves to Times Square Church and Sagrada Família. Conditional address rows appear only when Places returns them, the pin and time zone update with each place, and **Reset to initial value** restores the address the record opened with. [Watch the full-quality MP4](https://raw.githubusercontent.com/rodrigobarona/datocms-plugin-places-autocomplete/main/docs/demo.mp4).
 
 On the DatoCMS Marketplace, the same recording plays in the preview above this README. That player comes from `datoCmsPlugin.previewImage` in `package.json`, which points at `docs/demo.mp4` inside the published package. The README itself stays a still image and a GIF, the same split official plugins use.
 
@@ -22,9 +22,9 @@ On the DatoCMS Marketplace, the same recording plays in the preview above this R
 
 **Plugin settings.** One required Google Maps API key, saved with an explicit Save button. The parameter name is `mapsAPIKey`.
 
-**Field presentation.** The editor is available only on JSON fields, under the name **Google Places address**. Each field can choose the language Google should prefer for suggestions. That setting is stored as `{ "label": "English", "value": "en" }`.
+**Field presentation.** The editor is available only on JSON fields, under the name **Google Places address**. Each field can choose the language Google should prefer for suggestions, and optionally which string/text field should prefill an empty Places lookup (for example Name or Title). Those settings are stored as `{ "label": "…", "value": "…" }` objects.
 
-**Record editor.** A Places lookup sits above a read-only summary: venue, street, subpremise, city, state or region, postal code, and country. Under that, a map drops a pin on the saved coordinates. Latitude and longitude are shown beside the time zone, written relative to the editor’s own clock:
+**Record editor.** A Places lookup sits above a read-only summary of the components Google returned for that place: venue, street, subpremise, neighborhood, sublocality, city, ward, administrative areas, postal code, and country. Empty components stay hidden, so a Portuguese address can show a district without an empty US-style state row, and a US address can show region and county when Places provides them. Under that, a map drops a pin on the saved coordinates. Editors can pan and zoom the map with drag and the +/- controls. Latitude and longitude are shown beside the time zone, written relative to the editor’s own clock:
 
 - **Same time zone (UTC +1)**
 - **1 hour ahead (UTC +2)**
@@ -35,7 +35,7 @@ Choosing a suggestion writes the JSON immediately. Clearing the lookup writes an
 
 On focus, the lookup asks for the browser location and biases suggestions toward that area. Location access is optional; search still works if it is denied.
 
-The map is read-only. It uses [OpenFreeMap](https://openfreemap.org/) tiles through [MapLibre GL](https://maplibre.org/), so showing the pin does not call Google’s Maps JavaScript map and is not billed as a Dynamic Map. Scroll and drag are disabled so the record form keeps moving normally.
+The map uses [OpenFreeMap](https://openfreemap.org/) tiles through [MapLibre GL](https://maplibre.org/), so showing the pin does not call Google’s Maps JavaScript map and is not billed as a Dynamic Map. Pan and zoom are enabled so editors can inspect the neighborhood around the pin.
 
 ## Requirements
 
@@ -65,6 +65,7 @@ Check the iframe origin in the browser network panel before locking the referrer
 3. Create or edit a **JSON** field.
 4. Under **Presentation**, set the field editor to **Google Places address**.
 5. Choose the results language.
+6. Optionally choose **Prefill search from** and pick a string/text field such as Name. When the address is empty, the Places lookup is seeded with that field’s value so editors can open suggestions without retyping.
 
 ## Stored value
 
@@ -90,7 +91,7 @@ The field value is pretty-printed JSON:
 }
 ```
 
-Component values use Google's short text when it is available, so country stays `US` and a state stays `NC`. Extra component types returned by Places, such as `neighborhood`, are kept on the object even when the summary form does not show them.
+Component values use Google's short text when it is available, so country stays `US` and a region stays `NC`. The editor shows a standard set of address components (venue, street, neighborhood, locality, administrative areas, postal code, country, and related fields) only when Places returns a value for them. Extra component types that are not part of that form still stay on the saved JSON object.
 
 `utc_offset_minutes` stays a number of minutes from UTC. The friendly sentence is only a display. A frontend can format it the same way, or pass the coordinates to MapLibre, Leaflet, or Google Maps.
 
@@ -128,6 +129,8 @@ pnpm peers check
 ```
 
 `pnpm check` runs Oxlint with warnings denied, the unit tests, the TypeScript build, and the Vite production build.
+
+To refresh Marketplace screenshots and the README demo, put a key in `.env.local` as `GOOGLE_MAPS_API_KEY=…`, run `pnpm demo:capture`, open `http://localhost:5174/?capture=1`, and capture from that page.
 
 MapLibre’s worker files are copied into `public/` on install and build, then shipped next to `index.html`, so the map also works from the versioned plugin CDN.
 

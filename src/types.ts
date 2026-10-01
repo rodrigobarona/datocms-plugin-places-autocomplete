@@ -30,4 +30,6 @@ export type LanguageOption = {
 
 export type FieldParameters = {
   language: LanguageOption;
+  /** API key of a string/text field used to seed an empty Places lookup */
+  searchSeedField: LanguageOption | null;
 };

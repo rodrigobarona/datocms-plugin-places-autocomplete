@@ -10,11 +10,13 @@ import {
   TextInput,
 } from 'datocms-react-ui';
 import LocationMap from '../../components/LocationMap';
+import { getVisibleAddressFields } from '../../lib/addressDisplayFields';
 import {
   createEmptyAddress,
   getValueAtPath,
   parseAddressValue,
 } from '../../lib/addressValue';
+import { extractPlainTextValue } from '../../lib/fieldOptions';
 import { loadPlacesLibrary } from '../../lib/googleMaps';
 import { mapPlaceToAddress } from '../../lib/mapPlaceToAddress';
 import {
@@ -25,6 +27,15 @@ import { saveAddress } from '../../lib/saveAddress';
 import { formatUtcOffset } from '../../lib/utcOffset';
 import type { AddressValue } from '../../types';
 import styles from './AddressInput.module.css';
+
+const SPAN_CLASS: Record<2 | 3 | 4 | 5 | 6 | 12, string | undefined> = {
+  2: styles.span2,
+  3: styles.span3,
+  4: styles.span4,
+  5: styles.span5,
+  6: styles.span6,
+  12: styles.span12,
+};
 
 type AddressInputProps = {
   ctx: RenderFieldExtensionCtx;
@@ -46,7 +57,12 @@ export default function AddressInput({ ctx }: AddressInputProps) {
   const { mapsAPIKey } = normalizePluginParameters(
     ctx.plugin.attributes.parameters,
   );
-  const { language } = normalizeFieldParameters(ctx.parameters);
+  const { language, searchSeedField } = normalizeFieldParameters(
+    ctx.parameters,
+  );
+  const seedText = searchSeedField
+    ? extractPlainTextValue(ctx.formValues[searchSeedField.value], ctx.locale)
+    : '';
 
   useEffect(() => {
     const host = autocompleteHostRef.current;
@@ -58,6 +74,14 @@ export default function AddressInput({ ctx }: AddressInputProps) {
     const autocompleteHost = host;
     let cancelled = false;
     let element: google.maps.places.PlaceAutocompleteElement | undefined;
+    const initialLookupValue =
+      initialAddress.formatted_address ||
+      (searchSeedField
+        ? extractPlainTextValue(
+            ctx.formValues[searchSeedField.value],
+            ctx.locale,
+          )
+        : '');
 
     async function mountAutocomplete() {
       try {
@@ -73,7 +97,7 @@ export default function AddressInput({ ctx }: AddressInputProps) {
           disabled: ctx.disabled,
           placeholder: 'Start typing an address or venue name…',
           requestedLanguage: language.value,
-          value: initialAddress.formatted_address,
+          value: initialLookupValue,
         });
         autocompleteElementRef.current = element;
 
@@ -166,9 +190,25 @@ export default function AddressInput({ ctx }: AddressInputProps) {
     initialAddress.formatted_address,
     language.value,
     mapsAPIKey,
+    searchSeedField?.value,
   ]);
 
+  useEffect(() => {
+    const element = autocompleteElementRef.current;
+
+    if (!element) {
+      return;
+    }
+
+    const addressIsEmpty = !address.formatted_address;
+
+    if (addressIsEmpty && seedText && element.value !== seedText) {
+      element.value = seedText;
+    }
+  }, [address.formatted_address, seedText]);
+
   const { lat, lng } = address.coordinates;
+  const visibleFields = getVisibleAddressFields(address);
 
   async function handleReset() {
     if (autocompleteElementRef.current) {
@@ -202,54 +242,24 @@ export default function AddressInput({ ctx }: AddressInputProps) {
           </FieldWrapper>
         </FieldGroup>
 
-        <FieldGroup className={styles.addressComponents!}>
-          <FieldWrapper id="venue-name" label="Venue name">
-            <TextInput disabled value={address.name} />
-          </FieldWrapper>
-          <FieldWrapper id="street-address" label="Street address">
-            <TextInput
-              disabled
-              value={
-                address.street_number
-                  ? `${address.street_number} ${address.route}`.trim()
-                  : address.route
-              }
-            />
-          </FieldWrapper>
-          <FieldWrapper
-            id="subpremise"
-            label="Subpremise"
-            hint="Apartment, suite, or unit"
-          >
-            <TextInput disabled value={address.subpremise} />
-          </FieldWrapper>
-          <FieldWrapper id="city" label="City">
-            <TextInput disabled value={address.locality} />
-          </FieldWrapper>
-          <FieldWrapper id="state" label="State or region">
-            <TextInput
-              disabled
-              value={address.administrative_area_level_1}
-            />
-          </FieldWrapper>
-          <FieldWrapper id="postal-code" label="Postal code">
-            <TextInput
-              disabled
-              value={
-                address.postal_code
-                  ? `${address.postal_code}${
-                      address.postal_code_suffix
-                        ? `-${address.postal_code_suffix}`
-                        : ''
-                    }`
-                  : ''
-              }
-            />
-          </FieldWrapper>
-          <FieldWrapper id="country" label="Country">
-            <TextInput disabled value={address.country} />
-          </FieldWrapper>
-        </FieldGroup>
+        {visibleFields.length > 0 ? (
+          <FieldGroup className={styles.addressComponents!}>
+            {visibleFields.map((field) => (
+              <div
+                key={field.id}
+                className={SPAN_CLASS[field.span] ?? styles.span12}
+              >
+                <FieldWrapper
+                  id={field.id}
+                  label={field.label}
+                  hint={field.hint}
+                >
+                  <TextInput disabled value={field.value} />
+                </FieldWrapper>
+              </div>
+            ))}
+          </FieldGroup>
+        ) : null}
 
         <section className={styles.location} aria-label="Location">
           {lat !== null && lng !== null ? (
