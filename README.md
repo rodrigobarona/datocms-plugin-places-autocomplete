@@ -2,28 +2,40 @@
 
 ![Google Places Autocomplete cover](marketplace/cover.jpg)
 
-A DatoCMS plugin that turns a JSON field into a Google Places address editor. Editors search for an address or venue, pick a suggestion, and the field stores structured JSON: street parts, city, region, country, postal code, venue name, formatted address, coordinates, and UTC offset.
+A DatoCMS JSON field that turns a Google Places search into a structured address, a map pin, and a time zone an editor can read at a glance.
 
-This is a new plugin. It keeps the JSON shape of the original [DatoCMS Address Autocomplete](https://github.com/elevationchurch/datocms-plugin-adress-autocomplete) plugin (v1.2.0, by Ulises Himely / Elevation Church) so existing records can be read by the same frontend queries. It does not replace that package or its Marketplace listing.
+Use it for venues, stores, offices, event locations, campuses, or any record that needs a real place instead of a free-text address. The saved JSON keeps street, city, region, postal code, country, coordinates, and UTC offset, so a website can render the address, plot it on a map, or compare the place’s clock with the visitor’s.
 
-The original plugin was built on DatoCMS Plugin SDK 0.7, Create React App, and the legacy `google.maps.places.Autocomplete` widget. This version is built on the current stack:
+This plugin keeps the JSON shape of the original [DatoCMS Address Autocomplete](https://github.com/elevationchurch/datocms-plugin-adress-autocomplete) plugin (v1.2.0, by Ulises Himely / Elevation Church), so existing records stay readable by the same frontend queries. It does not replace that package or its Marketplace listing.
 
-- DatoCMS Plugin SDK 2.5 and `datocms-react-ui` 2.5
-- Vite, React 19, and TypeScript 7
-- Google Place Autocomplete (New) through `PlaceAutocompleteElement`
-- `@googlemaps/js-api-loader` 2 (`setOptions` and `importLibrary`)
+## Demo
+
+![Searching a place, dropping a pin, and reading the time zone](https://raw.githubusercontent.com/rodrigobarona/datocms-plugin-places-autocomplete/main/docs/demo.gif)
+
+The demo starts from a saved Lisbon address, searches Times Square Church, then Sagrada Família. The pin and the time zone update with each place, and **Reset to initial value** restores the address the record opened with. [Watch the full-quality MP4](https://raw.githubusercontent.com/rodrigobarona/datocms-plugin-places-autocomplete/main/docs/demo.mp4).
+
+On the DatoCMS Marketplace, the same recording plays in the preview above this README. That player comes from `datoCmsPlugin.previewImage` in `package.json`, which points at `docs/demo.mp4` inside the published package. The README itself stays a still image and a GIF, the same split official plugins use.
 
 ## What editors see
 
-![Address field editor preview](marketplace/preview.jpg)
+![Address field with a map pin and a friendly time zone](marketplace/preview.jpg)
 
 **Plugin settings.** One required Google Maps API key, saved with an explicit Save button. The parameter name is `mapsAPIKey`.
 
 **Field presentation.** The editor is available only on JSON fields, under the name **Google Places address**. Each field can choose the language Google should prefer for suggestions. That setting is stored as `{ "label": "English", "value": "en" }`.
 
-**Record editor.** A Places lookup sits above a read-only summary: venue, street, subpremise, city, state or region, postal code, country, latitude, longitude, and UTC offset in minutes. Choosing a suggestion writes the JSON immediately. Clearing the lookup writes an empty address. **Reset to initial value** restores the address that was loaded when the record form opened and saves that value back to the field.
+**Record editor.** A Places lookup sits above a read-only summary: venue, street, subpremise, city, state or region, postal code, and country. Under that, a map drops a pin on the saved coordinates. Latitude and longitude are shown beside the time zone, written relative to the editor’s own clock:
+
+- **Same time zone (UTC +1)**
+- **1 hour ahead (UTC +2)**
+- **5 hours behind (UTC -4)**
+- **4 hours 30 minutes ahead (UTC +5:30)** when the offset is not a whole hour
+
+Choosing a suggestion writes the JSON immediately. Clearing the lookup writes an empty address and hides the map. **Reset to initial value** restores the address that was loaded when the record form opened and saves that value back to the field.
 
 On focus, the lookup asks for the browser location and biases suggestions toward that area. Location access is optional; search still works if it is denied.
+
+The map is read-only. It uses [OpenFreeMap](https://openfreemap.org/) tiles through [MapLibre GL](https://maplibre.org/), so showing the pin does not call Google’s Maps JavaScript map and is not billed as a Dynamic Map. Scroll and drag are disabled so the record form keeps moving normally.
 
 ## Requirements
 
@@ -80,6 +92,8 @@ The field value is pretty-printed JSON:
 
 Component values use Google's short text when it is available, so country stays `US` and a state stays `NC`. Extra component types returned by Places, such as `neighborhood`, are kept on the object even when the summary form does not show them.
 
+`utc_offset_minutes` stays a number of minutes from UTC. The friendly sentence is only a display. A frontend can format it the same way, or pass the coordinates to MapLibre, Leaflet, or Google Maps.
+
 ## Moving a field from the original plugin
 
 The original plugin stays installed until you change each field. To point a JSON field at this editor:
@@ -93,7 +107,7 @@ New selections are written in the same key names. Empty or invalid JSON is treat
 
 ## Billing
 
-`PlaceAutocompleteElement` manages the autocomplete session. Each selection calls `Place.fetchFields()` for `addressComponents`, `displayName`, `formattedAddress`, `location`, and `utcOffsetMinutes`. That request closes the session and is billed under current Place Autocomplete and Place Details prices. Check Google Maps Platform pricing before production use.
+`PlaceAutocompleteElement` manages the autocomplete session. Each selection calls `Place.fetchFields()` for `addressComponents`, `displayName`, `formattedAddress`, `location`, and `utcOffsetMinutes`. That request closes the session and is billed under current Place Autocomplete and Place Details prices. The confirmation map does not add a Google map load. Check Google Maps Platform pricing before production use.
 
 ## Development
 
@@ -115,9 +129,11 @@ pnpm peers check
 
 `pnpm check` runs Oxlint with warnings denied, the unit tests, the TypeScript build, and the Vite production build.
 
+MapLibre’s worker files are copied into `public/` on install and build, then shipped next to `index.html`, so the map also works from the versioned plugin CDN.
+
 ## Publishing
 
-Version 1.1.0 publishes the `dist` folder and the Marketplace images in `marketplace/`. `datoCmsPlugin.coverImage` is the listing banner, and `datoCmsPlugin.previewImage` is the field-editor preview. A published GitHub release runs the npm workflow when the `NPM_TOKEN` repository secret is set.
+A published GitHub release runs the npm workflow when the `NPM_TOKEN` repository secret is set. The package includes `dist`, the Marketplace images in `marketplace/`, and `docs/demo.mp4`. `datoCmsPlugin.coverImage` is the listing banner. `datoCmsPlugin.previewImage` is the video the Marketplace plays above this README.
 
 ## License
 

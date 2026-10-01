@@ -9,6 +9,7 @@ import {
   Form,
   TextInput,
 } from 'datocms-react-ui';
+import LocationMap from '../../components/LocationMap';
 import {
   createEmptyAddress,
   getValueAtPath,
@@ -21,6 +22,7 @@ import {
   normalizePluginParameters,
 } from '../../lib/parameters';
 import { saveAddress } from '../../lib/saveAddress';
+import { formatUtcOffset } from '../../lib/utcOffset';
 import type { AddressValue } from '../../types';
 import styles from './AddressInput.module.css';
 
@@ -28,8 +30,8 @@ type AddressInputProps = {
   ctx: RenderFieldExtensionCtx;
 };
 
-function displayCoordinate(value: number | null): string {
-  return value === null ? '' : String(value);
+function formatCoordinate(value: number): string {
+  return value.toFixed(6);
 }
 
 export default function AddressInput({ ctx }: AddressInputProps) {
@@ -166,6 +168,8 @@ export default function AddressInput({ ctx }: AddressInputProps) {
     mapsAPIKey,
   ]);
 
+  const { lat, lng } = address.coordinates;
+
   async function handleReset() {
     if (autocompleteElementRef.current) {
       autocompleteElementRef.current.value = initialAddress.formatted_address;
@@ -247,30 +251,33 @@ export default function AddressInput({ ctx }: AddressInputProps) {
           </FieldWrapper>
         </FieldGroup>
 
-        <FieldGroup className={styles.coordinates!}>
-          <FieldWrapper id="latitude" label="Latitude">
-            <TextInput
-              disabled
-              value={displayCoordinate(address.coordinates.lat)}
-            />
-          </FieldWrapper>
-          <FieldWrapper id="longitude" label="Longitude">
-            <TextInput
-              disabled
-              value={displayCoordinate(address.coordinates.lng)}
-            />
-          </FieldWrapper>
-          <FieldWrapper id="utc-offset" label="UTC offset (minutes)">
-            <TextInput
-              disabled
-              value={
-                address.utc_offset_minutes === null
-                  ? ''
-                  : String(address.utc_offset_minutes)
-              }
-            />
-          </FieldWrapper>
-        </FieldGroup>
+        <section className={styles.location} aria-label="Location">
+          {lat !== null && lng !== null ? (
+            <>
+              <LocationMap lat={lat} lng={lng} />
+              <dl className={styles.locationFacts}>
+                <div>
+                  <dt>Latitude</dt>
+                  <dd>{formatCoordinate(lat)}</dd>
+                </div>
+                <div>
+                  <dt>Longitude</dt>
+                  <dd>{formatCoordinate(lng)}</dd>
+                </div>
+                <div>
+                  <dt>Time zone</dt>
+                  <dd className={styles.timeZone}>
+                    {formatUtcOffset(address.utc_offset_minutes) || '—'}
+                  </dd>
+                </div>
+              </dl>
+            </>
+          ) : (
+            <p className={styles.locationEmpty}>
+              Select a place to see it on the map.
+            </p>
+          )}
+        </section>
 
         <Button
           type="button"

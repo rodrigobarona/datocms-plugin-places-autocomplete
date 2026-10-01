@@ -33,19 +33,53 @@
   grid-column: span 3;
 }
 
-.coordinates {
+.location {
+  display: grid;
+  gap: var(--spacing-s);
+  margin-bottom: var(--spacing-l);
+}
+
+.locationFacts {
   display: grid;
   gap: var(--spacing-m);
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.locationFacts dt {
+  color: var(--light-body-color);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.locationFacts dd {
+  color: var(--base-body-color);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--font-size-m);
+  margin: 2px 0 0;
+}
+
+.locationFacts .timeZone {
+  font-family: inherit;
+}
+
+.locationEmpty {
+  border: 1px dashed var(--border-color);
+  border-radius: 4px;
+  color: var(--light-body-color);
+  font-size: var(--font-size-s);
+  margin: 0;
+  padding: var(--spacing-l);
+  text-align: center;
 }
 
 @media (width <= 700px) {
-  .addressComponents > *,
-  .coordinates > * {
+  .addressComponents > * {
     grid-column: 1 / -1;
   }
 
-  .coordinates {
+  .locationFacts {
     grid-template-columns: 1fr;
   }
 }
