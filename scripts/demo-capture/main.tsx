@@ -11,7 +11,7 @@ import './demo.css';
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
 
-const INITIAL_ADDRESS: AddressValue = {
+const LISBON_ADDRESS: AddressValue = {
   ...createEmptyAddress(),
   name: 'R. Álvaro Benamor 2B',
   street_number: '2B',
@@ -30,13 +30,70 @@ const INITIAL_ADDRESS: AddressValue = {
   utc_offset_minutes: 60,
 };
 
+const TIMES_SQUARE_ADDRESS: AddressValue = {
+  ...createEmptyAddress(),
+  name: 'Times Square Church',
+  street_number: '237',
+  route: 'W 51st St',
+  sublocality: 'Manhattan',
+  locality: 'New York',
+  administrative_area_level_2: 'New York County',
+  administrative_area_level_1: 'NY',
+  postal_code: '10019',
+  postal_code_suffix: '6261',
+  country: 'US',
+  formatted_address: '237 W 51st St, New York, NY 10019, USA',
+  coordinates: {
+    lat: 40.76244,
+    lng: -73.984134,
+  },
+  utc_offset_minutes: -240,
+};
+
+const OLLEM_ADDRESS: AddressValue = {
+  ...createEmptyAddress(),
+  name: 'Ollem Turismo',
+  locality: 'Valada',
+  administrative_area_level_3: 'Valada',
+  administrative_area_level_2: 'Cartaxo',
+  administrative_area_level_1: 'Santarém',
+  postal_code: '2070-613',
+  country: 'PT',
+  formatted_address: 'Ollem Turismo, Valada, Portugal',
+  coordinates: {
+    lat: 39.081631,
+    lng: -8.758425,
+  },
+  utc_offset_minutes: 60,
+};
+
+const SAMPLE_ADDRESSES = {
+  lisbon: LISBON_ADDRESS,
+  'times-square': TIMES_SQUARE_ADDRESS,
+  ollem: OLLEM_ADDRESS,
+} as const;
+
+type SampleAddressId = keyof typeof SAMPLE_ADDRESSES;
+
+function readInitialAddress(): AddressValue {
+  const fixture = new URLSearchParams(window.location.search).get('fixture');
+
+  if (fixture === 'times-square' || fixture === 'ollem' || fixture === 'lisbon') {
+    return SAMPLE_ADDRESSES[fixture];
+  }
+
+  return LISBON_ADDRESS;
+}
+
 function formatCoordinate(value: number): string {
   return value.toFixed(6);
 }
 
 function DemoApp() {
-  const [address, setAddress] = useState<AddressValue>(INITIAL_ADDRESS);
-  const [query, setQuery] = useState(INITIAL_ADDRESS.formatted_address);
+  const [address, setAddress] = useState<AddressValue>(readInitialAddress);
+  const [query, setQuery] = useState(
+    () => readInitialAddress().formatted_address,
+  );
   const [status, setStatus] = useState('Ready');
   const captureMode = new URLSearchParams(window.location.search).has('capture');
   const visibleFields = useMemo(
@@ -87,9 +144,15 @@ function DemoApp() {
     }
   }
 
+  function showSample(sampleId: SampleAddressId) {
+    const sample = SAMPLE_ADDRESSES[sampleId];
+    setAddress(sample);
+    setQuery(sample.formatted_address);
+    setStatus(`Showing ${sample.name}`);
+  }
+
   function handleReset() {
-    setAddress(INITIAL_ADDRESS);
-    setQuery(INITIAL_ADDRESS.formatted_address);
+    showSample('lisbon');
     setStatus('Reset to initial value');
   }
 
@@ -141,12 +204,26 @@ function DemoApp() {
           <div className="demoActions">
             <button
               type="button"
+              data-testid="sample-times-square"
+              onClick={() => showSample('times-square')}
+            >
+              Times Square Church
+            </button>
+            <button
+              type="button"
+              data-testid="sample-ollem"
+              onClick={() => showSample('ollem')}
+            >
+              Ollem Turismo
+            </button>
+            <button
+              type="button"
               data-testid="search-times-square"
               onClick={() =>
                 void searchAndSelect('Times Square Church New York')
               }
             >
-              Times Square Church
+              Search Times Square
             </button>
             <button
               type="button"

@@ -74,6 +74,7 @@ body {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 1px 2px rgb(28 30 33 / 4%);
+  container-type: inline-size;
 }
 
 .demoField {
@@ -141,32 +142,30 @@ body {
 .demoFields {
   display: grid;
   gap: var(--spacing-m);
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   margin-bottom: 20px;
 }
 
-.span-2 {
-  grid-column: span 2;
+.demoFields > * {
+  min-width: 0;
 }
 
-.span-3 {
-  grid-column: span 3;
-}
+@container (min-width: 520px) {
+  .demoFields {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
 
-.span-4 {
-  grid-column: span 4;
-}
+  .span-4 {
+    grid-column: span 4;
+  }
 
-.span-5 {
-  grid-column: span 5;
-}
+  .span-6 {
+    grid-column: span 6;
+  }
 
-.span-6 {
-  grid-column: span 6;
-}
-
-.span-12 {
-  grid-column: span 12;
+  .span-12 {
+    grid-column: span 12;
+  }
 }
 
 .demoLocation {
@@ -217,16 +216,7 @@ body {
   cursor: pointer;
 }
 
-@media (width <= 700px) {
-  .span-2,
-  .span-3,
-  .span-4,
-  .span-5,
-  .span-6,
-  .span-12 {
-    grid-column: 1 / -1;
-  }
-
+@media (width <= 640px) {
   .demoFacts {
     grid-template-columns: 1fr;
   }

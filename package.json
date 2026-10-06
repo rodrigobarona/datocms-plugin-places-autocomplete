@@ -1,6 +1,6 @@
 {
   "name": "datocms-plugin-places-autocomplete",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Search a Google Place, save a structured address, and show it on a map with a time zone.",
   "homepage": "https://github.com/rodrigobarona/datocms-plugin-places-autocomplete",
   "repository": {

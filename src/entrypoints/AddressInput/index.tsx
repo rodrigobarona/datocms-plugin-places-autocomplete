@@ -28,11 +28,8 @@ import { formatUtcOffset } from '../../lib/utcOffset';
 import type { AddressValue } from '../../types';
 import styles from './AddressInput.module.css';
 
-const SPAN_CLASS: Record<2 | 3 | 4 | 5 | 6 | 12, string | undefined> = {
-  2: styles.span2,
-  3: styles.span3,
+const SPAN_CLASS: Record<4 | 6 | 12, string | undefined> = {
   4: styles.span4,
-  5: styles.span5,
   6: styles.span6,
   12: styles.span12,
 };
@@ -243,22 +240,29 @@ export default function AddressInput({ ctx }: AddressInputProps) {
         </FieldGroup>
 
         {visibleFields.length > 0 ? (
-          <FieldGroup className={styles.addressComponents!}>
-            {visibleFields.map((field) => (
-              <div
-                key={field.id}
-                className={SPAN_CLASS[field.span] ?? styles.span12}
-              >
-                <FieldWrapper
-                  id={field.id}
-                  label={field.label}
-                  hint={field.hint}
+          <div className={styles.addressGrid}>
+            <div className={styles.addressComponents}>
+              {visibleFields.map((field) => (
+                <div
+                  key={field.id}
+                  className={SPAN_CLASS[field.span] ?? styles.span12}
                 >
-                  <TextInput disabled value={field.value} />
-                </FieldWrapper>
-              </div>
-            ))}
-          </FieldGroup>
+                  <FieldWrapper
+                    id={field.id}
+                    label={field.label}
+                    hint={field.hint}
+                  >
+                    <TextInput
+                      disabled
+                      id={field.id}
+                      title={field.value}
+                      value={field.value}
+                    />
+                  </FieldWrapper>
+                </div>
+              ))}
+            </div>
+          </div>
         ) : null}
 
         <section className={styles.location} aria-label="Location">
